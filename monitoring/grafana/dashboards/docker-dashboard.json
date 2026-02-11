@@ -1,0 +1,72 @@
+{
+  "id": null,
+  "uid": "docker-monitoring",
+  "title": "Docker Container Monitoring",
+  "tags": ["docker", "containers"],
+  "timezone": "browser",
+  "schemaVersion": 16,
+  "version": 0,
+  "refresh": "10s",
+  "panels": [
+    {
+      "id": 1,
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "type": "graph",
+      "title": "HTTP Request Rate",
+      "targets": [
+        {
+          "expr": "rate(http_requests_total[5m])",
+          "legendFormat": "{{method}} {{route}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "type": "graph",
+      "title": "Response Time (p95)",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
+          "legendFormat": "p95"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "type": "graph",
+      "title": "Container CPU Usage",
+      "targets": [
+        {
+          "expr": "rate(container_cpu_usage_seconds_total{name=~\"app.*\"}[5m]) * 100",
+          "legendFormat": "{{name}}"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "type": "graph",
+      "title": "Container Memory Usage",
+      "targets": [
+        {
+          "expr": "container_memory_usage_bytes{name=~\"app.*\"} / 1024 / 1024",
+          "legendFormat": "{{name}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+      "type": "graph",
+      "title": "Database Connections",
+      "targets": [
+        {
+          "expr": "pg_stat_database_numbackends{datname=\"hosting_db\"}",
+          "legendFormat": "Active Connections"
+        }
+      ]
+    }
+  ]
+}

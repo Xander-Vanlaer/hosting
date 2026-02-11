@@ -1,0 +1,68 @@
+# ============================================
+# Prometheus Configuration
+# ============================================
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'hosting-platform'
+    environment: 'production'
+
+# Alertmanager configuration (optional)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['alertmanager:9093']
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Application containers
+  - job_name: 'app'
+    static_configs:
+      - targets: 
+          - 'app-1:3000'
+          - 'app-2:3000'
+          - 'app-3:3000'
+        labels:
+          service: 'application'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # PostgreSQL metrics (requires postgres_exporter)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-primary:5432']
+        labels:
+          service: 'database'
+          role: 'primary'
+      - targets: ['postgres-replica:5432']
+        labels:
+          service: 'database'
+          role: 'replica'
+
+  # Redis metrics (requires redis_exporter)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+        labels:
+          service: 'cache'
+
+  # cAdvisor for container metrics
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+        labels:
+          service: 'monitoring'
+    scrape_interval: 10s
+
+  # Node exporter (if deployed)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          service: 'infrastructure'

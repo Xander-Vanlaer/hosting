@@ -1,0 +1,18 @@
+# ============================================
+# Terraform Variables Example
+# Copy this file to terraform.tfvars and fill in your values
+# ============================================
+
+proxmox_api_url      = "https://proxmox.example.com:8006/api2/json"
+proxmox_user         = "root@pam"
+proxmox_password     = "your-proxmox-password"
+proxmox_tls_insecure = true
+proxmox_node         = "pve"
+
+template_name = "ubuntu-22.04-template"
+storage_name  = "local-lvm"
+worker_count  = 2
+
+network_bridge  = "vmbr0"
+network_gateway = "10.0.1.1"
+dns_servers     = "8.8.8.8,8.8.4.4"

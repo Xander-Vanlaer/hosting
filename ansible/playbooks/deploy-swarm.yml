@@ -1,0 +1,68 @@
+---
+- name: Initialize Docker Swarm
+  hosts: swarm_managers
+  become: yes
+  tasks:
+    - name: Initialize Docker Swarm
+      command: docker swarm init --advertise-addr {{ ansible_host }}
+      register: swarm_init
+      ignore_errors: yes
+
+    - name: Get worker join token
+      command: docker swarm join-token -q worker
+      register: worker_token
+      when: swarm_init is succeeded
+
+    - name: Get manager join token
+      command: docker swarm join-token -q manager
+      register: manager_token
+      when: swarm_init is succeeded
+
+    - name: Set worker join command as fact
+      set_fact:
+        worker_join_command: "docker swarm join --token {{ worker_token.stdout }} {{ ansible_host }}:2377"
+      when: swarm_init is succeeded
+
+- name: Join workers to Swarm
+  hosts: swarm_workers
+  become: yes
+  tasks:
+    - name: Join Swarm as worker
+      command: "{{ hostvars[groups['swarm_managers'][0]]['worker_join_command'] }}"
+      ignore_errors: yes
+
+- name: Label Swarm nodes
+  hosts: swarm_managers
+  become: yes
+  tasks:
+    - name: Label worker nodes
+      command: "docker node update --label-add {{ item.label }}={{ item.value }} {{ item.node }}"
+      loop:
+        - { node: 'swarm-worker-01', label: 'postgres', value: 'primary' }
+        - { node: 'swarm-worker-02', label: 'redis', value: 'primary' }
+      ignore_errors: yes
+
+- name: Deploy application stack
+  hosts: swarm_managers
+  become: yes
+  tasks:
+    - name: Create deployment directory
+      file:
+        path: /opt/hosting
+        state: directory
+        mode: '0755'
+
+    - name: Copy docker-compose file
+      copy:
+        src: ../../docker-compose.prod.yml
+        dest: /opt/hosting/docker-compose.yml
+
+    - name: Copy environment file
+      copy:
+        src: ../../.env
+        dest: /opt/hosting/.env
+
+    - name: Deploy stack
+      command: docker stack deploy -c /opt/hosting/docker-compose.yml hosting
+      args:
+        chdir: /opt/hosting

@@ -1,0 +1,20 @@
+[swarm_managers]
+swarm-manager-01 ansible_host=10.0.1.10
+
+[swarm_workers]
+swarm-worker-01 ansible_host=10.0.1.11
+swarm-worker-02 ansible_host=10.0.1.12
+
+[swarm:children]
+swarm_managers
+swarm_workers
+
+[swarm:vars]
+ansible_user=ubuntu
+ansible_python_interpreter=/usr/bin/python3
+
+[storage]
+nfs-storage-01 ansible_host=10.0.1.20
+
+[monitoring]
+monitoring-01 ansible_host=10.0.1.30

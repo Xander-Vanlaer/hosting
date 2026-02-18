@@ -44,7 +44,14 @@ Complete production-ready hosting platform op DevOps-niveau met volledige automa
 git clone https://github.com/Xander-Vanlaer/hosting.git
 cd hosting
 
-# Setup environment
+# Run setup script (creates directories, validates config)
+# For Linux/Mac:
+./scripts/setup-local.sh
+
+# For Windows:
+scripts\setup-local.bat
+
+# Setup environment (or use the .env created by setup script)
 cp .env.example .env
 
 # Start all services

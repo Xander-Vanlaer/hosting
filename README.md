@@ -57,11 +57,36 @@ curl http://localhost/health
 
 **Services Available:**
 - **Application**: http://localhost (via HAProxy)
+- **Dashboard**: http://localhost:5000 (admin/admin)
 - **HAProxy Stats**: http://localhost:8404
 - **PostgreSQL**: localhost:5432
 - **Prometheus**: http://localhost:9090
 - **Grafana**: http://localhost:3001 (admin/admin)
 - **cAdvisor**: http://localhost:8080
+
+## 🎨 Web Dashboard
+
+Access the deployment dashboard at **http://localhost:5000**
+
+Default credentials:
+- Username: `admin`
+- Password: `admin` (change in .env)
+
+Features:
+- 🚀 One-click application deployment
+- 📊 Real-time service monitoring
+- 📝 Container log viewer
+- ⚖️ Easy scaling controls
+- 🔧 Configuration management
+
+**Quick Start:**
+1. Visit http://localhost:5000
+2. Log in with credentials (admin/admin)
+3. Click "Deploy" tab → Upload ZIP or select runtime → Click "Deploy" → App is live
+4. View all services with status, logs, and metrics in the "Services" tab
+5. Monitor overall system health in the "Overview" tab
+
+No terminal/command-line knowledge required!
 
 ### Option 2: Production Deployment (Docker Swarm)
 

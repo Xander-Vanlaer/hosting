@@ -14,8 +14,7 @@ checkSession();
 
 // Login form handler
 loginForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
+  e.preventDefault();  
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').value;
   
@@ -139,18 +138,48 @@ async function loadMetrics() {
     const response = await fetch(`${API_BASE}/metrics`, {
       credentials: 'include'
     });
-    const data = await response.json();
     
-    if (response.ok) {
-      document.getElementById('total-containers').textContent = data.containers.total;
-      document.getElementById('running-containers').textContent = data.containers.running;
-      document.getElementById('stopped-containers').textContent = data.containers.stopped;
-      document.getElementById('avg-cpu').textContent = data.resources.cpu + '%';
-    } else {
-      console.error('Failed to load metrics:', data);
+    if (!response.ok) {
+      if (response.status === 401) {
+        console.error('Unauthorized - redirecting to login');
+        showLogin();
+        return;
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+    
+    const data = await response.json();
+    document.getElementById('total-containers').textContent = data.containers.total;
+    document.getElementById('running-containers').textContent = data.containers.running;
+    document.getElementById('stopped-containers').textContent = data.containers.stopped;
+    document.getElementById('avg-cpu').textContent = data.resources.cpu + '%';
   } catch (error) {
     console.error('Error loading metrics:', error);
+  }
+}
+
+// Load services
+async function loadServices() {
+  try {
+    const response = await fetch(`${API_BASE}/deploy`, {
+      credentials: 'include'
+    });
+    
+    if (!response.ok) {
+      if (response.status === 401) {
+        console.error('Unauthorized - redirecting to login');
+        showLogin();
+        return;
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Services loaded:', data);
+    // Add your DOM manipulation code here to display services
+    // Example: renderServices(data);
+  } catch (error) {
+    console.error('Error loading services:', error);
   }
 }
 

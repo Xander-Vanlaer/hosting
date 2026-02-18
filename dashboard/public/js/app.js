@@ -22,6 +22,7 @@ loginForm.addEventListener('submit', async (e) => {
   try {
     const response = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -47,7 +48,8 @@ loginForm.addEventListener('submit', async (e) => {
 logoutBtn.addEventListener('click', async () => {
   try {
     await fetch(`${API_BASE}/auth/logout`, {
-      method: 'POST'
+      method: 'POST',
+      credentials: 'include'
     });
     showLogin();
   } catch (error) {
@@ -67,7 +69,9 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
 // Check if user is already logged in
 async function checkSession() {
   try {
-    const response = await fetch(`${API_BASE}/auth/session`);
+    const response = await fetch(`${API_BASE}/auth/session`, {
+      credentials: 'include'
+    });
     const data = await response.json();
     
     if (data.authenticated) {
@@ -132,7 +136,9 @@ function switchTab(tabName) {
 // Load metrics
 async function loadMetrics() {
   try {
-    const response = await fetch(`${API_BASE}/metrics`);
+    const response = await fetch(`${API_BASE}/metrics`, {
+      credentials: 'include'
+    });
     const data = await response.json();
     
     if (response.ok) {

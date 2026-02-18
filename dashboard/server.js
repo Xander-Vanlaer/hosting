@@ -25,7 +25,7 @@ app.use(cors({
     
     // In development, allow localhost on specific ports only
     if (process.env.NODE_ENV !== 'production') {
-      const portMatch = origin.match(/^http:\/\/localhost:(\d+)$/);
+      const portMatch = origin.match(/^https?:\/\/localhost:(\d+)$/);
       if (portMatch && devPorts.includes(parseInt(portMatch[1]))) {
         return callback(null, true);
       }

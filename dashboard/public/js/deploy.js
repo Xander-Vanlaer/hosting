@@ -58,7 +58,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function showAlert(type, message) {
-    deployAlert.className = `alert alert-${type}`;
+    // Validate type to prevent class injection
+    const validTypes = ['success', 'error'];
+    const alertType = validTypes.includes(type) ? type : 'error';
+    
+    deployAlert.className = `alert alert-${alertType}`;
     deployAlert.textContent = message;
     deployAlert.style.display = 'block';
     

@@ -5,7 +5,9 @@
 
 # Dependencies
 node_modules/
+# package-lock.json - Allow in app/ directory for npm ci
 package-lock.json
+!app/package-lock.json
 
 # Logs
 *.log

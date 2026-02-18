@@ -100,7 +100,7 @@ function showLogin() {
 // Show dashboard
 function showDashboard(username) {
   loginPage.style.display = 'none';
-  dashboardPage.classList.add('active';
+  dashboardPage.classList.add('active');
   usernameDisplay.textContent = username;
 }
 

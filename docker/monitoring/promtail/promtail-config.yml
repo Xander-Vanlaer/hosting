@@ -54,6 +54,7 @@ scrape_configs:
           expressions:
             tag:
           source: attrs
+      # Extract container name from tag (assumes pipe-delimited format)
       - regex:
           expression: (?P<container_name>[^|]+)
           source: tag

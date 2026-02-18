@@ -55,7 +55,7 @@ scrape_configs:
             tag:
           source: attrs
       - regex:
-          expression: (?P<container_name>(?:[^|]*[^|]))
+          expression: (?P<container_name>[^|]+)
           source: tag
       - labels:
           container_name:

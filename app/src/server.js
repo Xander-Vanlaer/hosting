@@ -16,7 +16,7 @@ app.use(compression());
 app.use(express.json());
 
 // Prometheus metrics
-const register = new promClient.Register();
+const register = promClient.register;
 promClient.collectDefaultMetrics({ register });
 
 const httpRequestDuration = new promClient.Histogram({

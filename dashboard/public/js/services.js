@@ -59,9 +59,15 @@ async function loadServices() {
                 <p class="error" style="color: #d32f2f; margin-bottom: 1rem;">
                     ❌ Failed to load services: ${escapeHtml(error.message)}
                 </p>
-                <button class="btn btn-primary" onclick="loadServices()">🔄 Try Again</button>
+                <button class="btn btn-primary" id="retryLoadServices">🔄 Try Again</button>
             </div>
         `;
+        
+        // Attach retry event listener
+        const retryBtn = document.getElementById('retryLoadServices');
+        if (retryBtn) {
+            retryBtn.addEventListener('click', loadServices);
+        }
     }
 }
 

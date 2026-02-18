@@ -1,4 +1,6 @@
 // Load and display services/containers
+let cachedServices = [];
+
 async function loadServices() {
     const servicesGrid = document.getElementById('services-grid');
     servicesGrid.innerHTML = '<div class="spinner"></div>';
@@ -16,14 +18,15 @@ async function loadServices() {
         }
         
         const services = await response.json();
+        cachedServices = services; // Cache services for event handlers
         
         if (!Array.isArray(services) || services.length === 0) {
             servicesGrid.innerHTML = '<p style="text-align: center; padding: 2rem; color: #666;">No services found</p>';
             return;
         }
         
-        servicesGrid.innerHTML = services.map(service => `
-            <div class="service-card">
+        servicesGrid.innerHTML = services.map((service, index) => `
+            <div class="service-card" data-service-id="${escapeHtml(service.id)}" data-service-name="${escapeHtml(service.name || service.id.substring(0, 12))}" data-service-index="${index}">
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
                     <h3 style="margin: 0;">${escapeHtml(service.name || service.id.substring(0, 12))}</h3>
                     <span class="service-status ${service.state === 'running' ? 'status-running' : 'status-stopped'}">
@@ -32,19 +35,22 @@ async function loadServices() {
                 </div>
                 <p><strong>Image:</strong> ${escapeHtml(service.image || 'N/A')}</p>
                 <p><strong>Status:</strong> ${escapeHtml(service.status || 'N/A')}</p>
-                <p><strong>ID:</strong> <code>${service.id ? service.id.substring(0, 12) : 'N/A'}</code></p>
+                <p><strong>ID:</strong> <code>${escapeHtml(service.id ? service.id.substring(0, 12) : 'N/A')}</code></p>
                 ${service.state === 'running' ? `
                     <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                        <button class="btn btn-secondary" onclick="viewLogs('${service.id}', '${escapeHtml(service.name || service.id.substring(0, 12))}')">
+                        <button class="btn btn-secondary" data-action="viewLogs" data-index="${index}">
                             📋 View Logs
                         </button>
-                        <button class="btn btn-warning" onclick="restartService('${service.id}', '${escapeHtml(service.name || service.id.substring(0, 12))}')">
+                        <button class="btn btn-warning" data-action="restartService" data-index="${index}">
                             🔄 Restart
                         </button>
                     </div>
                 ` : ''}
             </div>
         `).join('');
+        
+        // Add event listeners to action buttons
+        attachServiceEventListeners();
         
     } catch (error) {
         console.error('Error loading services:', error);
@@ -57,6 +63,26 @@ async function loadServices() {
             </div>
         `;
     }
+}
+
+// Attach event listeners to service action buttons
+function attachServiceEventListeners() {
+    const buttons = document.querySelectorAll('[data-action]');
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const action = this.getAttribute('data-action');
+            const index = parseInt(this.getAttribute('data-index'));
+            const service = cachedServices[index];
+            
+            if (!service) return;
+            
+            if (action === 'viewLogs') {
+                viewLogs(service.id, service.name || service.id.substring(0, 12));
+            } else if (action === 'restartService') {
+                restartService(service.id, service.name || service.id.substring(0, 12));
+            }
+        });
+    });
 }
 
 // Helper function to escape HTML and prevent XSS

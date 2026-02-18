@@ -16,14 +16,19 @@ app.use(express.urlencoded({ extended: true }));
 
 // CORS configuration - allow credentials with specific origin
 const allowedOrigin = process.env.CORS_ORIGIN || 'http://localhost:5000';
+const devPorts = [3000, 5000, 8080, 8000]; // Allowed development ports
+
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
     
-    // In development, allow localhost on any port
-    if (process.env.NODE_ENV !== 'production' && origin.match(/^http:\/\/localhost:\d+$/)) {
-      return callback(null, true);
+    // In development, allow localhost on specific ports only
+    if (process.env.NODE_ENV !== 'production') {
+      const portMatch = origin.match(/^http:\/\/localhost:(\d+)$/);
+      if (portMatch && devPorts.includes(parseInt(portMatch[1]))) {
+        return callback(null, true);
+      }
     }
     
     // Check against allowed origin

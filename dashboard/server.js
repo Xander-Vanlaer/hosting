@@ -14,9 +14,30 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// CORS configuration
+// CORS configuration - allow credentials with specific origin
+const allowedOrigin = process.env.CORS_ORIGIN || 'http://localhost:5000';
+const devPorts = [3000, 5000, 8080, 8000]; // Allowed development ports
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    
+    // In development, allow localhost on specific ports only
+    if (process.env.NODE_ENV !== 'production') {
+      const portMatch = origin.match(/^https?:\/\/localhost:(\d+)$/);
+      if (portMatch && devPorts.includes(parseInt(portMatch[1]))) {
+        return callback(null, true);
+      }
+    }
+    
+    // Check against allowed origin
+    if (origin === allowedOrigin || allowedOrigin === '*') {
+      return callback(null, true);
+    }
+    
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 
@@ -25,10 +46,12 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'change-this-secret-in-production',
   resave: false,
   saveUninitialized: false,
+  name: 'dashboard.sid', // Custom session name
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax' // Lax in dev for easier testing
   }
 }));
 
